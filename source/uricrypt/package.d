@@ -8,6 +8,8 @@ import std.algorithm : min;
 import std.typecons : Nullable;
 import std.exception : assertThrown;
 
+@safe:
+
 alias Shake128 = SHAKE128;
 enum siv_size = 16;
 enum PADBS = 3; // Padding block size for base64 compatibility
@@ -99,7 +101,7 @@ void xorInPlace(ubyte[] data, const(ubyte)[] keystream)
 	}
 }
 
-ubyte[] encryptUri(string uri, string secret_key, string context)
+ubyte[] encryptUri(string uri, string secret_key, string context) @trusted
 {
 	const auto components = splitUri(uri);
 
@@ -173,7 +175,7 @@ ubyte[] encryptUri(string uri, string secret_key, string context)
 	return result.data;
 }
 
-ubyte[] decryptUri(string encrypted_uri, string secret_key, string context)
+ubyte[] decryptUri(string encrypted_uri, string secret_key, string context) @trusted
 {
 	Nullable!string scheme;
 	string encrypted_part_str;
@@ -477,7 +479,7 @@ version (unittest)
 		assert(data == [0xFF, 0xFF, 0xFF, 0xFF]);
 	}
 
-	@("encrypt_decrypt_basic") unittest
+	@("encrypt_decrypt_basic") @trusted unittest
 	{
 		const string uri = "https://example.com";
 		const string secret_key = "test_key";
@@ -520,7 +522,7 @@ version (unittest)
 		assert(!equal(encrypted1, encrypted2));
 	}
 
-	@("round_trip_various_uris") unittest
+	@("round_trip_various_uris") @trusted unittest
 	{
 		const string[] test_cases = [
 			"https://example.com",
@@ -555,7 +557,7 @@ version (unittest)
 		}
 	}
 
-	@("decrypt_wrong_key") unittest
+	@("decrypt_wrong_key") @trusted unittest
 	{
 		const string uri = "https://example.com";
 		const string encrypt_key = "key1";
@@ -567,7 +569,7 @@ version (unittest)
 		assertThrown!Exception(decryptUri(cast(string) encrypted, decrypt_key, context));
 	}
 
-	@("decrypt_wrong_context") unittest
+	@("decrypt_wrong_context") @trusted unittest
 	{
 		const string uri = "https://example.com";
 		const string secret_key = "test_key";
@@ -579,7 +581,7 @@ version (unittest)
 		assertThrown!Exception(decryptUri(cast(string) encrypted, secret_key, context2));
 	}
 
-	@("path_only_encryption") unittest
+	@("path_only_encryption") @trusted unittest
 	{
 		const string secret_key = "test_key";
 		const string context = "test_context";
@@ -610,7 +612,7 @@ version (unittest)
 		assert(equal(decrypted2, cast(ubyte[]) path2));
 	}
 
-	@("path_only_uris_with_prefix") unittest
+	@("path_only_uris_with_prefix") @trusted unittest
 	{
 		const string secret_key = "test_key";
 		const string context = "test_context";
@@ -641,7 +643,7 @@ version (unittest)
 		}
 	}
 
-	@("keys_with_identical_halves_work") unittest
+	@("keys_with_identical_halves_work") @trusted unittest
 	{
 		const string uri = "https://example.com/path";
 		const string identical_halves_key = "same_halfsame_half"; // Both halves are identical
