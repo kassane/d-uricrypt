@@ -1,0 +1,13 @@
+{
+	"name": "uricrypt",
+	"description": "Prefix-preserving URI encryption scheme",
+	"version": "0.1.0",
+	"license": "MIT",
+	"authors": [
+		"Matheus Catarino França"
+	],
+	"dependencies": {
+		"sha3-d": "~>1.2.4"
+	},
+	"targetType": "library"
+}
